@@ -18,5 +18,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 //запрос должен идти с клиента каждый 10 секунд
 Route::get('run','FarmController@index');
-
+Route::get('refresh','FarmController@refresh');
 

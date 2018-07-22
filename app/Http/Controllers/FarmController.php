@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Farm;
 use App\FarmSheep;
 use App\SheepTransfer;
-use Illuminate\Http\Request;
-use phpDocumentor\Reflection\Types\Integer;
 use App\Http\Services\FarmService;
 
 class FarmController extends Controller
@@ -39,10 +37,14 @@ class FarmController extends Controller
                     return 'error';
                 };
             }
-            $sheepFarms = FarmSheep::all();
-            FarmService::transfer(1);
 
-            return $sheepFarms;
+            FarmService::transfer(1);
+            $sheepFarms = FarmSheep::all();
+            return response()
+                ->json([
+                    'farms' => $sheepFarms,
+                     'day'=> 1
+                ]);
         } else {
             $currentFarm = FarmSheep::orderBy('id', 'desc')->first();
 
@@ -52,12 +54,26 @@ class FarmController extends Controller
             if ($currentDay % 10 == 0) {
                 FarmService::remove($currentDay);
             }
-
             FarmService::transfer($currentDay);
 
         }
+        $sheepFarm1 = FarmSheep::getLastSheepFarm(1);
+        $sheepFarm2 = FarmSheep::getLastSheepFarm(2);
+        $sheepFarm3 = FarmSheep::getLastSheepFarm(3);
+        $sheepFarm4 = FarmSheep::getLastSheepFarm(4);
+        $sheepFarms = [$sheepFarm1, $sheepFarm2, $sheepFarm3, $sheepFarm4];
+        return response()
+            ->json([
+                'farms' => $sheepFarms,
+                'day'=> $currentDay
+            ]);
+    }
 
-        return $sheepFarms = FarmSheep::all();
+    public function refresh()
+    {
+        FarmSheep::truncate();
+        SheepTransfer::truncate();
+        return $this->index();
     }
 
 }
